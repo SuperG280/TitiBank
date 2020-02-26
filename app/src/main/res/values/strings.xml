@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TitiBank</string>
+    <string name="action_settings">Settings</string>
+    <string name="main_resumen_totalprestado">Total prestado</string>
+    <string name="main_resumen_totaldevuelto">Ingresos realizados</string>
+    <string name="main_resumen_pendiente">Pendiente actual</string>
+    <string name="new_item_titulo">Nuevo movimiento</string>
+    <string name="new_item_prestamo">El titi me deja</string>
+    <string name="new_item_ingreso">Le devuelvo al titi</string>
+    <string name="new_item_fecha">Fecha</string>
+    <string name="new_item_importe">Importe</string>
+    <string name="new_item_descripcion">Descripcion</string>
+    <string name="new_item_nota">Nota</string>
+</resources>
