@@ -11,4 +11,8 @@
     <string name="new_item_importe">Importe</string>
     <string name="new_item_descripcion">Descripcion</string>
     <string name="new_item_nota">Nota</string>
+    <string name="borrar_item_titulo">Borrar</string>
+    <string name="borrar_item_descripcion">¿De verdad quieres borrar esto? Piensa que no hay vuelta de hoja...</string>
+    <string name="borrar_boton_confirar">que síííí</string>
+    <string name="borrar_boton_cancelar">Vaaale no</string>
 </resources>

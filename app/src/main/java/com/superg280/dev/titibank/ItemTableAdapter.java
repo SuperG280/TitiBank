@@ -19,6 +19,11 @@ public class ItemTableAdapter extends BaseAdapter {
         this.items = items;
     }
 
+    public void setNewArrayItems( ArrayList<TitiItem> its) {
+
+        items = its;
+    }
+
     @Override
     public int getCount() {
         return items.size();

@@ -7,16 +7,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,26 +51,42 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 createNewItem();
+
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
             }
         });
+
+        titiItems = new ArrayList<>();
+        //refilMokItems();
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-
-        titiItems = new ArrayList<>();
-        refilMokItems();
-
         adapter = new ItemTableAdapter( this, titiItems);
         ListView lv = (ListView) findViewById(R.id.listView_Items);
         lv.setAdapter(adapter);
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                final int posicion = i;
+
+                deleteItemDlg( posicion);
+
+                return true;
+
+                /*
+                Snackbar.make(view, "Borrado de gasto", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                return true;
+                */
+            }
+        });
 
         paintResumen();
-        paintChartTotal();
     }
 
     public String formatImporte( double importe) {
@@ -80,6 +95,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void paintResumen() {
+
+        paintChartTotal();
 
         TextView txTotalPrestado = findViewById( R.id.textView_main_total_prestado);
         TextView txTotalIngresado = findViewById( R.id.textView_main_total_devuelto);
@@ -247,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
                 mySwitch.setText(getString(b ? R.string.new_item_ingreso : R.string.new_item_prestamo));
             }
         } );
-        
+
         builder.setView(v);
 
         builder.setPositiveButton("OK",
@@ -259,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
                                     editTextDescripcion.getText().toString(),
                                     editTextNota.getText().toString(),
                                     mySwitch.isChecked() ? TitiItem.ITEM_TYPE_INGRESO : TitiItem.ITEM_TYPE_PRESTAMO);
+
                     }
                 });
 
@@ -275,8 +293,84 @@ public class MainActivity extends AppCompatActivity {
         dlg.show();
     }
 
-    public void addNewItem( String fecha, String importe, String descripción, String nota, int type) {
+    public boolean addNewItem( String fecha, String importe, String descripcion, String nota, int type) {
 
+        String fecha_formated = fecha.replace( '/', '-');
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        Date date;
+        try {
+            date = sdf.parse(fecha_formated);
+        } catch( Exception ex) {
+            return false;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        long lImporte;
+        try {
+            lImporte = (long)(new Double( importe).doubleValue() * 100);
+        } catch( Exception ex) {
+            return false;
+        }
+
+        TitiItem it = new TitiItem( cal.getTimeInMillis(), descripcion, lImporte, type);
+        it.setNota( nota);
+        //addGastoInFireBase( it);
+        insertNewItemInArray( it);
+        adapter.setNewArrayItems( titiItems);
+        adapter.notifyDataSetChanged();
+        paintResumen();
+        return true;
+    }
+
+    public void insertNewItemInArray( TitiItem it) {
+
+        if( titiItems.size() == 0) {
+            titiItems.add( it);
+            return;
+        }
+
+        long NewFecha = it.getFecha();
+        for( int i = 0; i < titiItems.size(); i++) {
+
+            TitiItem g = titiItems.get( i);
+            if( g.getFecha() <= NewFecha) {
+                titiItems.add( i, it);
+                return;
+            }
+        }
+        //Si ha llegado a salir del bucle es que no ha encontrado
+        //una fecha menor y esta es la menor, así que lo mete el último.
+        titiItems.add( it);
+    }
+
+    public void deleteItemDlg( final int posicion) {
+
+        AlertDialog.Builder dlgBorrar = new AlertDialog.Builder(this);
+        dlgBorrar.setTitle(getString(R.string.borrar_item_titulo));
+        dlgBorrar.setMessage(getString(R.string.borrar_item_descripcion));
+        dlgBorrar.setCancelable(false);
+        dlgBorrar.setPositiveButton(getString(R.string.borrar_boton_confirar), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogo1, int id) {
+                deleteItem(posicion);
+            }
+        });
+
+        dlgBorrar.setNegativeButton(getString(R.string.borrar_boton_cancelar), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogo1, int id) {
+            }
+        });
+        dlgBorrar.show();
+    }
+
+    public void deleteItem( int posicion) {
+        //deleteItemInFireBase( titiItems.get(posicion).getId());
+
+        titiItems.remove(posicion);
+
+        adapter.setNewArrayItems( titiItems);
+        adapter.notifyDataSetChanged();
+        paintResumen();
     }
 
     public void refilMokItems() {
