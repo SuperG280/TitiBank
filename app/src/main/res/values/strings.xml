@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TitiBank</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_condonar">Perdonar deuda</string>
     <string name="main_resumen_totalprestado">Total prestado</string>
     <string name="main_resumen_totaldevuelto">Ingresos realizados</string>
     <string name="main_resumen_pendiente">Pendiente actual</string>
@@ -11,8 +12,20 @@
     <string name="new_item_importe">Importe</string>
     <string name="new_item_descripcion">Descripcion</string>
     <string name="new_item_nota">Nota</string>
+    <string name="new_item_guardar">Guardar</string>
+    <string name="new_item_cancelar">Cancelar</string>
     <string name="borrar_item_titulo">Borrar</string>
     <string name="borrar_item_descripcion">¿De verdad quieres borrar esto? Piensa que no hay vuelta de hoja...</string>
     <string name="borrar_boton_confirar">que síííí</string>
     <string name="borrar_boton_cancelar">Vaaale no</string>
+    <string name="show_item_titulo_prestamo">El titi me dejó</string>
+    <string name="show_item_titulo_ingreso">Le di al titi</string>
+    <string name="show_item_nota_no_nota">-- sin nota --</string>
+    <string name="ajustes_mensaje_titulo">Ajustes</string>
+    <string name="ajustes_mensaje_descripcion">Se ajustará lo que se tenga que ajustar y callandico viva</string>
+    <string name="condonar_mensaje_titulo">Perdonar deuda</string>
+    <string name="condonar_mensaje_descripcion">Titi ya está bien. No seas cara dula</string>
+    <string name="mensajes_chorras_aceptar">callandico</string>
+
+
 </resources>

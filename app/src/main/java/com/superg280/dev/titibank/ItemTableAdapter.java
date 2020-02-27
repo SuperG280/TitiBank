@@ -2,10 +2,12 @@ package com.superg280.dev.titibank;
 
 import android.app.Activity;
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class ItemTableAdapter extends BaseAdapter {
         TextView fecha = v.findViewById(R.id.textView_itemtable_fecha);
         fecha.setText(item.formatFecha());
 
+
         TextView importe = v.findViewById(R.id.textView_itemtable_importe);
         String strImporte = "";
         if( item.getItemType() == TitiItem.ITEM_TYPE_PRESTAMO) {
@@ -63,6 +66,12 @@ public class ItemTableAdapter extends BaseAdapter {
             importe.setTextColor( activity.getColor(R.color.colorPositivo));
         }
         importe.setText( strImporte);
+
+        TextView descripcion = v.findViewById(R.id.textView_tableitem_descripcion);
+        descripcion.setText( item.getDescripcion());
+
+        ImageView imageNota = v.findViewById(R.id.imageView_tableitem_nota);
+        imageNota.setVisibility( item.hasNota() ? View.VISIBLE : View.GONE);
 
         return v;
     }

@@ -7,4 +7,7 @@
     <color name="colorPendiente">#F3C702</color>
     <color name="colorPositivo">#4CAF50</color>
     <color name="colorBlanco">#FFFFFF</color>
+    <color name="colorGrisTextp">#535353</color>
+    <color name="colorMuyGrisTextp">#CACACA</color>
+    <color name="colorNegroTexto">#010101</color>
 </resources>

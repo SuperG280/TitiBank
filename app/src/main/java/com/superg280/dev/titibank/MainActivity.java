@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         titiItems = new ArrayList<>();
-        //refilMokItems();
+        refilMokItems();
     }
 
     @Override
@@ -87,6 +88,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         paintResumen();
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final int position = i;
+                showItemDlg( position);
+
+            }
+        });
     }
 
     public String formatImporte( double importe) {
@@ -195,6 +205,29 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            AlertDialog.Builder dlgInfo = new AlertDialog.Builder(this);
+            dlgInfo.setTitle(getString(R.string.ajustes_mensaje_titulo));
+            dlgInfo.setMessage(getString(R.string.ajustes_mensaje_descripcion));
+            dlgInfo.setCancelable(false);
+            dlgInfo.setPositiveButton(getString(R.string.mensajes_chorras_aceptar), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogo1, int id) {
+
+                }
+            });
+            dlgInfo.show();
+            return true;
+        }
+        if( id == R.id.action_condonar) {
+            AlertDialog.Builder dlgInfo = new AlertDialog.Builder(this);
+            dlgInfo.setTitle(getString(R.string.condonar_mensaje_titulo));
+            dlgInfo.setMessage(getString(R.string.condonar_mensaje_descripcion));
+            dlgInfo.setCancelable(false);
+            dlgInfo.setPositiveButton(getString(R.string.mensajes_chorras_aceptar), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogo1, int id) {
+
+                }
+            });
+            dlgInfo.show();
             return true;
         }
 
@@ -232,6 +265,51 @@ public class MainActivity extends AppCompatActivity {
         recogerFecha.show();
     }
 
+    public void showItemDlg( final int position) {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.show_item_layout, null);
+
+        TitiItem item = titiItems.get( position);
+
+        final TextView twFecha = v.findViewById(R.id.textView_show_fecha);
+        final TextView twImporte = v.findViewById(R.id.textView_show_importe);
+        final TextView twDescripcion = v.findViewById(R.id.textView_show_descripcion);
+        final TextView twNota = v.findViewById(R.id.textView_show_nota);
+        final TextView twNotaLabel = v.findViewById(R.id.textView_show_label_nota);
+        final ImageView iwTipo = v.findViewById(R.id.imageView_show_icono);
+        final TextView twTitulo = v.findViewById(R.id.textView_show_titulo);
+
+        if( item.getItemType() == TitiItem.ITEM_TYPE_PRESTAMO) {
+            iwTipo.setImageDrawable(getDrawable(R.drawable.prestamo));
+            twImporte.setTextColor(getColor(R.color.colorNegativo));
+            twTitulo.setText( getString(R.string.show_item_titulo_prestamo));
+        } else {
+            iwTipo.setImageDrawable(getDrawable(R.drawable.ingreso));
+            twImporte.setTextColor(getColor(R.color.colorPositivo));
+            twTitulo.setText( getString(R.string.show_item_titulo_ingreso));
+        }
+
+        twFecha.setText(item.formatFecha());
+        twImporte.setText(item.formatImporte());
+        twDescripcion.setText(item.getDescripcion());
+        if( item.hasNota()) {
+            twNota.setText(item.getNota());
+        } else {
+            twNota.setText( getString(R.string.show_item_nota_no_nota));
+            twNota.setTextColor( getColor(R.color.colorMuyGrisTextp));
+        }
+
+        builder.setView(v);
+
+        AlertDialog dlg = builder.create();
+
+        dlg.show();
+    }
+
     public void createNewItem() {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -267,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setView(v);
 
-        builder.setPositiveButton("OK",
+        builder.setPositiveButton( getString(R.string.new_item_guardar),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -280,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        builder.setNegativeButton("CANCELAR",
+        builder.setNegativeButton(getString(R.string.new_item_cancelar),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
