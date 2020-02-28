@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "132612690609",
+    "firebase_url": "https://titibank-f54d1.firebaseio.com",
+    "project_id": "titibank-f54d1",
+    "storage_bucket": "titibank-f54d1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132612690609:android:e1b6d626eaaadf1369c890",
+        "android_client_info": {
+          "package_name": "com.superg280.dev.titibank"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "132612690609-elirpfo9dd02rmvrg6cob61u8ohglp61.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.superg280.dev.titibank",
+            "certificate_hash": "3341a44974198b00872f72ab164336bd319d77b5"
+          }
+        },
+        {
+          "client_id": "132612690609-m6e5075oula5gse6di58r0ij3eec96q9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHOBX59houRl6QVX73Q_o6l98Q7vPd-Qo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "132612690609-m6e5075oula5gse6di58r0ij3eec96q9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

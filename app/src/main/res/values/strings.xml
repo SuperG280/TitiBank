@@ -26,6 +26,9 @@
     <string name="condonar_mensaje_titulo">Perdonar deuda</string>
     <string name="condonar_mensaje_descripcion">Titi ya está bien. No seas cara dula</string>
     <string name="mensajes_chorras_aceptar">callandico</string>
+    <string name="connect_fire_error">De alguna manera incomprensible, no hay conexión con los datos</string>
+    <string name="toas_loading_main">Haciendo tabajela...</string>
+    <string name="connect_error">Esto se ha ido de madre</string>
 
 
 </resources>

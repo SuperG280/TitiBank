@@ -6,7 +6,11 @@ import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
+
+@IgnoreExtraProperties
 public class TitiItem implements Serializable {
 
     public final static int ITEM_TYPE_NOME  = 0;
@@ -97,6 +101,7 @@ public class TitiItem implements Serializable {
         return df.format(cal.getTime());
     }
 
+    @Exclude
     public String formatImporte() {
         NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.getDefault());
         return  nf.format( (double)importe / 100);

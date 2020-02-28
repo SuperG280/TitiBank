@@ -2,8 +2,10 @@ package com.superg280.dev.titibank;
 
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -22,15 +24,25 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Date;
@@ -40,12 +52,21 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<TitiItem> titiItems = null;
     private ItemTableAdapter adapter = null;
 
+    private DatabaseReference mFirebaseDatabaseItems;
+    private ValueEventListener mFireBaseItemsEventListener;
+
+    public boolean isLoading = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        isLoading = true;
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        titiItems = new ArrayList<>();
+        adapter = new ItemTableAdapter( this, null);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -58,13 +79,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        titiItems = new ArrayList<>();
-        refilMokItems();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mFirebaseDatabaseItems = database.getReference("items");
+
+
+        //refilMokItems();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        isLoading = true;
+        new WaitTask().execute();
+        refillFireBaseItems();
+    }
+
+    public void refillMainWindow() {
 
         adapter = new ItemTableAdapter( this, titiItems);
         ListView lv = (ListView) findViewById(R.id.listView_Items);
@@ -74,16 +104,9 @@ public class MainActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 final int posicion = i;
-
                 deleteItemDlg( posicion);
-
                 return true;
 
-                /*
-                Snackbar.make(view, "Borrado de gasto", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                return true;
-                */
             }
         });
 
@@ -95,6 +118,62 @@ public class MainActivity extends AppCompatActivity {
                 final int position = i;
                 showItemDlg( position);
 
+            }
+        });
+        isLoading = false;
+    }
+
+    @Override
+    protected void onPause() {
+        mFirebaseDatabaseItems.removeEventListener( mFireBaseItemsEventListener);
+        super.onPause();
+    }
+
+    public void refillFireBaseItems() {
+
+        //mFirebaseDatabaseItems.addValueEventListener(new ValueEventListener() {
+        mFireBaseItemsEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+
+                titiItems = new ArrayList<>();
+                TitiItem it;
+                for( DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    it = postSnapshot.getValue( TitiItem.class);
+                    titiItems.add(it);
+                }
+
+                sortItems();
+                refillMainWindow();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                isLoading = false;
+                Toast.makeText(MainActivity.this, getString( R.string.connect_fire_error), Toast.LENGTH_LONG).show();
+            }
+        };
+        mFirebaseDatabaseItems.addValueEventListener( mFireBaseItemsEventListener);
+    }
+
+    public void deleteItemInFireBase( String gastoId) {
+
+        mFirebaseDatabaseItems.child( gastoId).removeValue();
+    }
+
+    public void addItemInFireBase( TitiItem it) {
+
+        mFirebaseDatabaseItems.child( it.getId()).setValue(it);
+    }
+
+    public void sortItems() {
+
+        Collections.sort(titiItems, new Comparator<TitiItem>() {
+            @Override
+            public int compare(TitiItem t1, TitiItem t2) {
+                return new Long(t2.getFecha()).compareTo(Long.valueOf(t1.getFecha()));
             }
         });
     }
@@ -393,7 +472,7 @@ public class MainActivity extends AppCompatActivity {
 
         TitiItem it = new TitiItem( cal.getTimeInMillis(), descripcion, lImporte, type);
         it.setNota( nota);
-        //addGastoInFireBase( it);
+        addItemInFireBase(it);
         insertNewItemInArray( it);
         adapter.setNewArrayItems( titiItems);
         adapter.notifyDataSetChanged();
@@ -442,13 +521,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deleteItem( int posicion) {
-        //deleteItemInFireBase( titiItems.get(posicion).getId());
+
+        deleteItemInFireBase( titiItems.get(posicion).getId());
 
         titiItems.remove(posicion);
 
         adapter.setNewArrayItems( titiItems);
         adapter.notifyDataSetChanged();
         paintResumen();
+    }
+
+    private class WaitTask extends AsyncTask<Void, Void, Integer>
+    {
+        private ProgressDialog Dialog = new ProgressDialog(MainActivity.this);
+
+        @Override
+        protected void onPreExecute()
+        {
+            Dialog.setMessage(getString( R.string.toas_loading_main));
+            Dialog.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params)
+        {
+            //Task for doing something
+            try {
+                Calendar inicio = Calendar.getInstance();
+                while ( isLoading) {
+                    Calendar ahora = Calendar.getInstance();
+                    if( ahora.getTimeInMillis() - inicio.getTimeInMillis() > 15000) {
+                        return 1;
+                    }
+                    Thread.sleep(100);
+                }
+            } catch( Exception ex) {}
+            return 0;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result)
+        {
+
+            if(result == 1)
+            {
+                Toast.makeText(MainActivity.this, getString( R.string.connect_error), Toast.LENGTH_LONG).show();
+                finish();
+            }
+            // after completed finished the progressbar
+            Dialog.dismiss();
+        }
     }
 
     public void refilMokItems() {

@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toStartOf="@+id/editText_new_item_importe"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintTop_toBottomOf="@+id/textView6"/>
 
     <EditText
         android:id="@+id/editText_new_item_importe"
