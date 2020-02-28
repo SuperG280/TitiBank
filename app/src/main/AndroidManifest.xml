@@ -9,6 +9,7 @@
         android:roundIcon="@drawable/ingreso"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".AboutActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
