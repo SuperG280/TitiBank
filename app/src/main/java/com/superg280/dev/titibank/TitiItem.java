@@ -93,7 +93,7 @@ public class TitiItem implements Serializable {
     public String formatFecha() {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis( fecha);
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd MMM yyyy");
         return df.format(cal.getTime());
     }
 
