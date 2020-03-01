@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -39,7 +40,6 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -96,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        mFirebaseDatabaseItems = database.getReference("items");
+
 
         isAutirizing = true;
         isAutirized = false;
@@ -118,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         //refilMokItems();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mFirebaseDatabaseItems = database.getReference("items");
     }
 
     @Override
@@ -400,7 +401,6 @@ public class MainActivity extends AppCompatActivity {
         final TextView twImporte = v.findViewById(R.id.textView_show_importe);
         final TextView twDescripcion = v.findViewById(R.id.textView_show_descripcion);
         final TextView twNota = v.findViewById(R.id.textView_show_nota);
-        final TextView twNotaLabel = v.findViewById(R.id.textView_show_label_nota);
         final ImageView iwTipo = v.findViewById(R.id.imageView_show_icono);
         final TextView twTitulo = v.findViewById(R.id.textView_show_titulo);
 
@@ -516,6 +516,10 @@ public class MainActivity extends AppCompatActivity {
         it.setNota( nota);
         addItemInFireBase(it);
         insertNewItemInArray( it);
+
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.cash);
+        mediaPlayer.start();
+
         adapter.setNewArrayItems( titiItems);
         adapter.notifyDataSetChanged();
         paintResumen();
