@@ -30,6 +30,7 @@
     <string name="connect_fire_error">De alguna manera incomprensible, no hay conexión con los datos</string>
     <string name="toas_loading_main">Haciendo tabajela...</string>
     <string name="connect_error">Esto se ha ido de madre</string>
+    <string name="autorizacion_error">Igual es un problema de usuario</string>
     <string name="copyrigth">SuperG © 2020</string>
     <string name="about_descripcion">Tu banco de confianza</string>
     <string name="about_version">v. 1.0.0</string>

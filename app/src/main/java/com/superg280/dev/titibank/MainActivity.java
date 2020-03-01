@@ -8,8 +8,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -32,6 +37,9 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,12 +65,18 @@ public class MainActivity extends AppCompatActivity {
     private ValueEventListener mFireBaseItemsEventListener;
 
     public boolean isLoading = false;
+    public boolean isAutirizing = false;
+    public boolean isAutirized = false;
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         isLoading = true;
+        isAutirizing = true;
+        isAutirized = false;
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -80,9 +94,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mAuth = FirebaseAuth.getInstance();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mFirebaseDatabaseItems = database.getReference("items");
 
+        isAutirizing = true;
+        isAutirized = false;
+        mAuth.signInWithEmailAndPassword("rsalvarez@gmail.com", "passwd0653")
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            isAutirizing = false;
+                            isAutirized = true;
+                        } else {
+                            isAutirizing = false;
+                        }
+
+                        // ...
+                    }
+                });
 
         //refilMokItems();
     }
@@ -91,7 +124,10 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         isLoading = true;
+
+
         new WaitTask().execute();
+
         refillFireBaseItems();
     }
 
@@ -554,10 +590,13 @@ public class MainActivity extends AppCompatActivity {
             //Task for doing something
             try {
                 Calendar inicio = Calendar.getInstance();
-                while ( isLoading) {
+                while ( isLoading && isAutirizing) {
                     Calendar ahora = Calendar.getInstance();
                     if( ahora.getTimeInMillis() - inicio.getTimeInMillis() > 15000) {
-                        return 1;
+                        if( isAutirized)
+                            return 1;
+                        else
+                            return 2;
                     }
                     Thread.sleep(100);
                 }
@@ -572,6 +611,9 @@ public class MainActivity extends AppCompatActivity {
             if(result == 1)
             {
                 Toast.makeText(MainActivity.this, getString( R.string.connect_error), Toast.LENGTH_LONG).show();
+                finish();
+            } else if( result == 2) {
+                Toast.makeText(MainActivity.this, getString( R.string.autorizacion_error), Toast.LENGTH_LONG).show();
                 finish();
             }
             // after completed finished the progressbar
